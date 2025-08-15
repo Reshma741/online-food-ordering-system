@@ -4,6 +4,7 @@ package com.jsp.onlinefoodorderingsystem.controller;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,6 +25,8 @@ import com.jsp.onlinefoodorderingsystem.entity.User;
 import com.jsp.onlinefoodorderingsystem.responseStructure.ResponseStructure;
 import com.jsp.onlinefoodorderingsystem.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 
 @RestController
@@ -42,12 +45,30 @@ public class UserController {
 	
 	
 	@GetMapping("/get/{id}")
+	 @Operation(
+		        summary = "Get user by ID",
+		        description = "Fetches the details of a specific user from the all the users using its unique ID.",
+		        responses = {
+		            @ApiResponse(responseCode = "200", description = "Successfully retrieved user"),
+		            @ApiResponse(responseCode = "404", description = "Food item not found"),
+		            @ApiResponse(responseCode ="500",description="Internal server error")
+		        })
 	public ResponseEntity<ResponseStructure<User>> getUserById(@PathVariable Integer id){
 		ResponseStructure<User> apiresponse= new ResponseStructure<User>(HttpStatus.OK.value(), "User with id: "+id+"is found", userService.getUser(id));
 		return ResponseEntity.ok(apiresponse);
 	}
 	
+	
+	
 	@GetMapping("/getAll")
+	@Operation(
+			summary="Get all the users",
+			description = "Fetch all the uusers details",
+			responses= {
+					@ApiResponse(responseCode = "200",description = "all users found"),
+					@ApiResponse(responseCode = "500",description = "internal server error")
+			}
+			)
 	public ResponseEntity<ResponseStructure<List<User>>> getAllUsers(){
 		ResponseStructure<List<User>> apiresponse= new ResponseStructure<List<User>>(HttpStatus.OK.value(), "All users found", userService.getAllUsers());
 		return  ResponseEntity.ok(apiresponse);
@@ -68,6 +89,14 @@ public class UserController {
 	
 	
 	@PatchMapping("/uplaodimage/user/{id}")
+	@Operation(
+			summary = "update the image to existiong user",
+			description = "update the image by user exsting user",
+			responses= {
+					@ApiResponse(responseCode = "200",description = "imaged is uploaded"),
+					@ApiResponse(responseCode = "404", description = "user is not found")
+			}
+			)
 	public ResponseEntity<ResponseStructure<String>> uplaodImage(@RequestParam MultipartFile image,@PathVariable Integer id) throws IOException{
 		String response=userService.uplaodImage(image, id);
 		ResponseStructure<String> rs= new ResponseStructure<String>(HttpStatus.OK.value() , "Image is uploded", response);
